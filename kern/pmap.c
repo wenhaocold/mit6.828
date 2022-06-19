@@ -156,7 +156,7 @@ mem_init(void)
 	// to initialize all fields of each struct PageInfo to 0.
 	// Your code goes here:
   pages = boot_alloc(npages * sizeof(struct PageInfo));
-  memset(pages, 0, PGSIZE);
+  memset(pages, 0, ROUNDUP(npages * sizeof(struct PageInfo), PGSIZE));
 
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
@@ -412,10 +412,10 @@ boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm
 
   size = ROUNDUP(size, PGSIZE);
   for (i = 0; i < size / PGSIZE; i++) {
-    va = va + i * PGSIZE;
-    pa = pa + i * PGSIZE;
     pte = pgdir_walk(pgdir, (void*)va, 1);
     *pte = pa | PTE_P |perm;
+    va = va + PGSIZE;
+    pa = pa + PGSIZE;
   }
 }
 
