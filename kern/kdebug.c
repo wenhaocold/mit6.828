@@ -205,7 +205,18 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	//	which one.
 	// Your code here.
 
-
+    int olline = lline, orline = rline;
+    stab_binsearch(stabs, &olline, &orline, N_SOL, (!(lline == lfile && rline == rfile))*addr + info->eip_fn_addr);
+    // 如果没有找到N_SOL
+    if (olline > orline) {
+    stab_binsearch(stabs, &lline, &rline, N_SLINE, addr);
+    // 如果在N_SLINE也没有找到
+    if (lline > rline) {
+       return -1;
+    }
+    }
+    // 记录找到的行号
+    info->eip_line = stabs[lline].n_desc;    
 	// Search backwards from the line number for the relevant filename
 	// stab.
 	// We can't just use the "lfile" stab because inlined functions
