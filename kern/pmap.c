@@ -388,7 +388,7 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
       return NULL;
     page->pp_ref++;
     physaddr_t k = page2pa(page);
-    *pde = k | PTE_P | PTE_W;
+    *pde = k | PTE_P | PTE_W | PTE_U;
   }
   physaddr_t pg_pa = PTE_ADDR(*pde);
   pte_t* pg_va = (pte_t*)KADDR(pg_pa);
