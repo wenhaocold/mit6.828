@@ -327,6 +327,7 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
     int err;
     int check;
     pte_t *pte;
+		struct PageInfo *pp;
 
     // error check
     if ((err = envid2env(envid, &e, 0)) < 0)
@@ -377,13 +378,15 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
     // receiver asks for page mapping
     if ((uintptr_t)e->env_ipc_dstva < UTOP && (uintptr_t)srcva < UTOP)
     {
+				if ((pp = page_lookup(curenv->env_pgdir, srcva, 0)) == NULL) {
+          e->env_tf.tf_regs.reg_eax = -E_INVAL;
+					return -E_INVAL;
+				}
         e->env_ipc_perm = perm;
-        if ((err = sys_page_map(curenv->env_id, srcva, envid,
-                                e->env_ipc_dstva, perm)) < 0)
-        {
+				if ((err = page_insert(e->env_pgdir, pp, e->env_ipc_dstva, perm))) {
             e->env_tf.tf_regs.reg_eax = err;
             return err;
-        }
+				}
     }
     else
     {
