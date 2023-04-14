@@ -193,7 +193,7 @@ mem_init(void)
 	// boot_map_region(kern_pgdir, UVPT + (UVPT >> 0), PGSIZE,
 	// 	PADDR(kern_pgdir), PTE_W);
 	boot_map_region(kern_pgdir, UPAGES, npages * sizeof(struct PageInfo),
-		PADDR(pages), PTE_W);
+		PADDR(pages), PTE_U);
 	//////////////////////////////////////////////////////////////////////
 	// Map the 'envs' array read-only by the user at linear address UENVS
 	// (ie. perm = PTE_U | PTE_P).
